@@ -1,9 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Switch from './Switch'
-
-const boardWidth : number = 5
-const boardHeight : number = 5
-const winLength : number = 4
 
 // Calculate winning combinations based on board size and win length
 function calculateWinningCombinations(boardWidth : number, boardHeight : number, winLength : number) : number[][] {
@@ -51,11 +47,11 @@ function calculateWinningCombinations(boardWidth : number, boardHeight : number,
 }
 
 // Check if the board has a winning combination and return winner
-function calculateWinner(board: string[], winningCombinations: number[][]) {
+function calculateWinner(board: string[], winningCombinations: number[][]) : string | null {
   for (let combination of winningCombinations) {
     let combinationExists = true
     for (let i = 0; i < combination.length - 1; i++) {
-      if (board[combination[i]] === null) {
+      if (board[combination[i]] === "") {
         combinationExists = false
         break
       }
@@ -66,13 +62,13 @@ function calculateWinner(board: string[], winningCombinations: number[][]) {
     }
     if (combinationExists) {
       console.log(combination)
-      return combination[0]
+      return board[combination[0]]
     }
   }
   return null
 }
 
-function Square({ value, onClick } : { value : string, onClick : () => void}) {
+function Square({ value, onClick } : { value : string, onClick : () => void}) : JSX.Element {
   return (
     <button 
       onClick={onClick} 
@@ -88,45 +84,90 @@ function Square({ value, onClick } : { value : string, onClick : () => void}) {
 }
 
 function App() {
-  const [board, setBoard] = useState(Array(boardWidth * boardHeight).fill(null))
-  const [isXTurn, setIsXTurn] = useState(true)
-  const [winner, setWinner] = useState('')
-  const winningCombinations = calculateWinningCombinations(boardWidth, boardHeight, winLength)
+  const [boardWidth, setBoardWidth] = useState<number>(3);
+  const [boardHeight, setBoardHeight] = useState<number>(3);
+  const [tempBoardWidth, setTempBoardWidth] = useState<number>(3);
+  const [tempBoardHeight, setTempBoardHeight] = useState<number>(3);
+  const [winLength, setWinLength] = useState<number>(3);
+  const [board, setBoard] = useState<Array<string>>(Array(3 * 3).fill(""));
+  const [isXTurn, setIsXTurn] = useState<boolean>(true);
+  const [winner, setWinner] = useState<string>('');
+  const winningCombinations = calculateWinningCombinations(boardWidth, boardHeight, winLength);
+  const [squares, setSquares] = useState<Array<JSX.Element>>([]);
 
-  function handleSquareClick(i : number) {
-    if (board[i] !== null || winner !== '') {
+  useEffect(() => {
+    resetBoard();
+  } , [boardWidth, boardHeight])
+
+  useEffect(() => {
+    setSquares(buildSquares(boardHeight, boardWidth, board));
+  }, [boardHeight, boardWidth, board]);
+
+  useEffect(() => {
+    console.log(board)
+  }, [board])
+
+  function handleSquareClick(i : number) : void {
+    if (board[i] !== '' || winner !== '') {
       return
     }
     const nextBoard = board.slice()
     let currentPlayer = isXTurn ? 'X' : 'O'
     nextBoard[i] = currentPlayer
     setBoard(nextBoard)
+    const winningCombinations = calculateWinningCombinations(boardWidth, boardHeight, winLength);
     if (calculateWinner(nextBoard, winningCombinations)) {
       setWinner(currentPlayer)
       alert('Winner is ' + currentPlayer + '!')
     }
     setIsXTurn(!isXTurn)
   }
+  
+  function buildSquares(boardHeight: number, boardWidth: number, board: Array<string>): Array<JSX.Element> {
+    let squares: Array<JSX.Element> = [];
+    for (let i = 0; i < boardHeight; i++) {
+      let row: Array<JSX.Element> = [];
+      for (let j = 0; j < boardWidth; j++) {
+        const index = i * boardWidth + j;
+        row.push(<Square key={index} value={board[index]} onClick={() => handleSquareClick(index)} />);
+      }
+      squares.push(<div className="flex" key={i}>{row}</div>);
+    }
+    return squares;
+  }
 
-  let squares : JSX.Element[] = []
-  for (let i = 0; i < boardHeight; i++) {
-    let row : JSX.Element[] = []
-    for (let j = 0; j < boardWidth; j++) {
-      const index = i * boardWidth + j
-      row.push(<Square key={index} value={board[index]} onClick={() => handleSquareClick(index)} />)
-    } 
-    squares.push(<div className="flex">{row}</div>)
+  function updateBoardSize() : void {
+    setBoardWidth(tempBoardWidth);
+    setBoardHeight(tempBoardHeight);
+    resetBoard();
+  }
+
+  function resetBoard() : void {
+    setBoard(Array(boardWidth * boardHeight).fill(""))
+    setIsXTurn(true)
+    setWinner('')
   }
 
   return (
     <>
       <Switch />
+      <div>
+        <div className="flex flex-col">
+          <label>Board Width</label>
+          <input type="number" value={tempBoardWidth} onChange={(e) => setTempBoardWidth(parseInt(e.target.value))} />
+        </div>
+        <div className="flex flex-col">
+          <label>Board Height</label>
+          <input type="number" value={tempBoardHeight} onChange={(e) => setTempBoardHeight(parseInt(e.target.value))} />
+        </div>
+        <div className="flex flex-col">
+          <label>Win Length</label>
+          <input type="number" value={winLength} onChange={(e) => setWinLength(parseInt(e.target.value))} />
+        </div>
+        <button onClick={updateBoardSize}>Update Board</button>
+      </div>
       {squares}
-      <button onClick={() => {
-        setBoard(Array(boardWidth * boardHeight).fill(null))
-        setIsXTurn(true)
-        setWinner('')
-      }}>Reset Game</button>
+      <button onClick={resetBoard}>Reset Game</button>
     </>
   )
 }
