@@ -40,26 +40,27 @@ function App() {
   }
 
   return (
-    <>
+    <div className="flex flex-col justify-center items-center space-y-8">
+      <h1 className="text-4xl font-semibold mt-8">Tic Tac Toe</h1>
       <Switch />
       <div>
         <div className="flex flex-col">
           <label>Board Width</label>
-          <input type="number" value={tempBoardWidth} onChange={(e) => setTempBoardWidth(parseInt(e.target.value))} />
+          <input className="bg-transparent p-1 mb-2 border border-gray-900 dark:border-white" type="number" value={tempBoardWidth} onChange={(e) => setTempBoardWidth(parseInt(e.target.value))} />
         </div>
         <div className="flex flex-col">
           <label>Board Height</label>
-          <input type="number" value={tempBoardHeight} onChange={(e) => setTempBoardHeight(parseInt(e.target.value))} />
+          <input className="bg-transparent p-1 mb-2 border border-gray-900 dark:border-white" type="number" value={tempBoardHeight} onChange={(e) => setTempBoardHeight(parseInt(e.target.value))} />
         </div>
         <div className="flex flex-col">
           <label>Win Length</label>
-          <input type="number" value={winLength} onChange={(e) => setWinLength(parseInt(e.target.value))} />
+          <input className="bg-transparent p-1 mb-2 border border-gray-900 dark:border-white" type="number" value={winLength} onChange={(e) => setWinLength(parseInt(e.target.value))} />
         </div>
-        <button onClick={updateBoardSize}>Update Board</button>
+        <button className="bg-blue-600 font-semibold p-2 rounded-md my-6" onClick={updateBoardSize}>Update Board</button>
       </div>
       <Board boardHeight={boardHeight} boardWidth={boardWidth} board={board} handleSquareClick={handleSquareClick} />
-      <button onClick={resetBoard}>Reset Game</button>
-    </>
+      <button className="bg-blue-600 font-semibold p-2 rounded-md my-6" onClick={resetBoard}>Reset Game</button>
+    </div>
   )
 }
 

@@ -9,10 +9,10 @@ function Square({ value, onClick } : { value : string, onClick : () => void}) : 
     return (
       <button 
         onClick={onClick} 
-        className="bg-gray-200 border border-black"
+        className="border border-gray-900 dark:border-gray-200"
         style={{
-          width: '80px',
-          height: '80px',
+          width: '5vh',
+          height: '5vh',
         }}
       >
         {value}

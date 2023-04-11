@@ -19,7 +19,9 @@ function Board({ boardHeight, boardWidth, board, handleSquareClick } : { boardHe
       squares.push(<div className="flex" key={i}>{row}</div>);
     }
     return (
-      <div>{squares}</div>
+      <div className="">
+        {squares}
+      </div>
     )
   }
 
